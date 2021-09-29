@@ -1,3 +1,9 @@
+[TOC]
+
+
+
+
+
 #### Online DDL
 
 mysql版本: 5.6
