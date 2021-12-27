@@ -87,7 +87,8 @@ message == undefined; // 返回 true
 #### Null
 
 ```js
-null === undefined; // 返回true
+null == undefined; // true
+null === undefined; // 返回false
 ```
 
 #### Number
