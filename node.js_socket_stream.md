@@ -29,12 +29,12 @@ net.createServer(function(c) {
 
 }).listen(9988);
 
-console.log('listen on 9988', ' pid:', process.pid)
+console.log('listen on 9988', ' pid:', process.pid)  
+
 ```
 
   
-
-
+  
 tcp_client.js
 
 ```js
