@@ -1,4 +1,5 @@
-net socket与stream事件  
+### net socket与stream事件  
+
 
 
 测试程序
@@ -33,7 +34,7 @@ console.log('listen on 9988', ' pid:', process.pid)
 
 ```
 
-
+<br />
 
 tcp_client.js
 
@@ -57,8 +58,7 @@ c.on('finish', function() {
 })
 ```
 
-  
-
+ <br />
 
 启动server，再启动cilent，ctrl +c 直接退出client，server端打印出：
 
@@ -75,12 +75,17 @@ close
 
   
 
+<br/>
+
+<br/>
 
 需要查socket的文档和stream的文档，再配合tcp的四次挥手理解。  
 
   
 
+<br />
 
+<br />
 
 socket的end事件：
 
@@ -106,9 +111,7 @@ socket是Duplex stream，可以看到socket的end与Readable stream的end意义�
 
 所以，在1触发，最先打印出了end。
 
-  
-  
-
+<br/>  <br/>
 
 socket没有finish事件，那么只能是stream里的：
 
@@ -122,9 +125,8 @@ https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_event_finish
 
 对应2，打印出finish。
 
-  
-  
-
+  <br/>
+  <br/>
 
 之后，socket的close事件:
 
@@ -148,7 +150,7 @@ https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_event_close_1
 >
 > A [`Readable`](https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_class_stream_readable) stream will always emit the `'close'` event if it is created with the `emitClose` option.
 
-  
+  <br/>
 
 
 Writable:
@@ -165,6 +167,6 @@ Readable和Writable两种流对close事件的描述高度一致，都是说流�
 
 对应3，打印close。
 
-  
+  <br/>
 
 
