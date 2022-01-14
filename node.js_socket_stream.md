@@ -33,9 +33,7 @@ console.log('listen on 9988', ' pid:', process.pid)
 
 ```
 
-  
 
-  
 
 tcp_client.js
 
@@ -78,11 +76,10 @@ close
   
 
 
-需要查socket的文档和stream的文档，再配合tcp的四次挥手理解。
-
+需要查socket的文档和stream的文档，再配合tcp的四次挥手理解。  
 
   
-    
+
 
 
 socket的end事件：
