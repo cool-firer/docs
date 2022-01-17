@@ -394,9 +394,7 @@ setTimeout(function() {
 
 在官方文档里，关于destroy的描述是这样：
 
-socket部分
-
-https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destroy_exception
+socket部分: https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destroy_exception
 
 > ### socket.destroy([exception])[#](https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destroy_exception)
 >
@@ -409,11 +407,11 @@ https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destroy_exception
 >
 > If `exception` is specified, an [`'error'`](https://nodejs.org/docs/latest-v10.x/api/net.html#net_event_error_1) event will be emitted and any listeners for that event will receive `exception` as an argument.
 
-<br />
 
-stream部分
 
-https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_writable_destroy_error
+stream部分: https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_writable_destroy_error
+
+
 
 > ##### writable.destroy([error])[#](https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_writable_destroy_error)
 >
