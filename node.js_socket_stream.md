@@ -263,7 +263,7 @@ https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_compatibility_with_o
 
 再去看服务端的代码，没有为新来的socket绑定'data'事件、也没有'readable' + read()方法消费内部data，socket处于pause mode。或者可以理解为，FIN包被排到了内部buffer的尾部，只有消费完了前面的data，才能轮到FIN包。
 
-![tcp_demo1](/Users/demon/Desktop/own/gitdocs/images/tcp_demo1.png)
+![tcp_demo1](./images/tcp_demo1.png)
 
 所以，要让他正常走完四次挥手，需要消费一下服务端的socket，像这样：
 
@@ -407,9 +407,13 @@ socket部分: https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destr
 >
 > If `exception` is specified, an [`'error'`](https://nodejs.org/docs/latest-v10.x/api/net.html#net_event_error_1) event will be emitted and any listeners for that event will receive `exception` as an argument.
 
-
+<br />
 
 stream部分: https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_writable_destroy_error
+
+
+
+
 
 
 
