@@ -400,8 +400,8 @@ socket部分: https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destr
 >
 > Added in: v0.1.90
 >
-> - `exception` [](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
-> - Returns: [](https://nodejs.org/docs/latest-v10.x/api/net.html#net_class_net_socket)
+> - `exception` [<Object>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+> - Returns: [<net.Socket>](https://nodejs.org/docs/latest-v10.x/api/net.html#net_class_net_socket)
 >
 > Ensures that no more I/O activity happens on this socket. Only necessary in case of errors (parse error or so).
 >
