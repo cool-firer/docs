@@ -398,9 +398,11 @@ socket部分: https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destr
 
 > ### socket.destroy([exception])
 >
-> Added in: v0.9.4
+> Added in: v0.1.90
 >
-> The `'finish'` event is emitted after the [`stream.end()`](https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_writable_end_chunk_encoding_callback) method has been called, and all data has been flushed to the underlying system.
+> Ensures that no more I/O activity happens on this socket. Only necessary in case of errors (parse error or so).
+>
+> If `exception` is specified, an [`'error'`](https://nodejs.org/docs/latest-v10.x/api/net.html#net_event_error_1) event will be emitted and any listeners for that event will receive `exception` as an argument.
 
 stream部分: https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_writable_destroy_error
 
