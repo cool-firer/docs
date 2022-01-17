@@ -396,6 +396,17 @@ setTimeout(function() {
 
 socket部分: https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destroy_exception
 
+> ### socket.destroy([exception])[#](https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destroy_exception)
+>
+> Added in: v0.1.90
+>
+> - `exception` [<Object>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+> - Returns: [<net.Socket>](https://nodejs.org/docs/latest-v10.x/api/net.html#net_class_net_socket)
+>
+> Ensures that no more I/O activity happens on this socket. Only necessary in case of errors (parse error or so).
+>
+> If `exception` is specified, an [`'error'`](https://nodejs.org/docs/latest-v10.x/api/net.html#net_event_error_1) event will be emitted and any listeners for that event will receive `exception` as an argument.
+
 
 
 stream部分: https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_writable_destroy_error
