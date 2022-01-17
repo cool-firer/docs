@@ -396,8 +396,6 @@ setTimeout(function() {
 
 socket部分: https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destroy_exception
 
-> ### socket.destroy([exception])[dd](https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destroy_exception)
->
 > Added in: v0.1.90
 >
 > - `exception` [<Object>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
