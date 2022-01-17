@@ -396,35 +396,13 @@ setTimeout(function() {
 
 socket部分: https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destroy_exception
 
-> ### socket.destroy([exception])[#](https://nodejs.org/docs/latest-v10.x/api/net.html#net_socket_destroy_exception)
->
-> Added in: v0.1.90
->
-> - `exception` [<Object>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
-> - Returns: [<net.Socket>](https://nodejs.org/docs/latest-v10.x/api/net.html#net_class_net_socket)
->
-> Ensures that no more I/O activity happens on this socket. Only necessary in case of errors (parse error or so).
->
-> If `exception` is specified, an [`'error'`](https://nodejs.org/docs/latest-v10.x/api/net.html#net_event_error_1) event will be emitted and any listeners for that event will receive `exception` as an argument.
 
-<br />
 
 stream部分: https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_writable_destroy_error
 
 
 
 
-
-
-
-> ##### writable.destroy([error])[#](https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_writable_destroy_error)
->
-> Added in: v8.0.0
->
-> - `error` [<Error>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)
-> - Returns: [<this>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)
->
-> Destroy the stream, and emit the passed `'error'` and a `'close'` event. After this call, the writable stream has ended and subsequent calls to `write()` or `end()` will result in an `ERR_STREAM_DESTROYED` error. Implementors should not override this method, but instead implement [`writable._destroy()`](https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_writable_destroy_err_callback).
 
 stream部分说，销毁流，并触发'close'事件，客户端确实是这样：
 
