@@ -1,3 +1,13 @@
+- [net socket与stream事件](#net-socket与stream事件)
+  - [测试程序](#测试程序)
+  - [socket.end与消费](#socketend与消费)
+  - [socket.destroy与finish](#socketdestroy与finish)
+  - [socket与Transform](#socket与transform)
+
+
+
+
+
 ## net socket与stream事件  
 
 
