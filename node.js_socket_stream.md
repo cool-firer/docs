@@ -447,3 +447,276 @@ close
 
 所以，发送FIN包后就不会马上触发'finish'，而是发送FIN包，并且内部buffer被刷到底层fd后才会触发。
 
+<br />
+
+### socket与Transform
+
+再来变一下，如果把socket pipe进一个自定义的Transform呢？很多网络NPM客户端库都是这么做的，比如mysql2、AMQ等。
+
+改写一下服务端代码：
+
+```js
+// tcp_server.js
+const net = require('net');
+
+class Incoming extends require('stream').Transform {
+  _flush(callback) {
+    console.log('  incoming _flush')
+    this.push(null);
+    callback();
+  }
+
+  _transform(chunk, encoding, callback) {
+    callback(null, chunk);
+  }
+}
+const income = new Incoming();
+
+
+net.createServer(function(c) {
+  console.log('conneceted');
+  
+  c.on('finish', function() {
+    console.log('finish 111');
+  })
+  c.on('close', function() {
+    console.log('close');
+  })
+  c.on('finish', function() {
+    console.log('finish 222');
+  })
+  c.on('end', function() {
+    console.log('end');
+  })
+
+  }, 5000)
+
+  c.pipe(income);
+
+  income.on('end' ,function() {
+    console.log('  incoming end')
+  })
+  income.on('finish' ,function() {
+    console.log('  incoming finish')
+  })
+  income.on('close' ,function() {
+    console.log('  incoming close')
+  })
+
+}).listen(9988);
+
+console.log('listen on 9988', ' pid:', process.pid)
+```
+
+<br />
+
+客户端保持不变，2s后end
+
+```js
+// tcp_client.js
+const net = require('net');
+
+
+const c = net.createConnection({
+  port: 9988
+})
+
+c.on('end', function() {
+  console.log('end');
+})
+c.on('finish', function() {
+  console.log('finish 111');
+})
+c.on('close', function() {
+  console.log('close');
+})
+c.on('finish', function() {
+  console.log('finish 222');
+})
+
+setTimeout(function() {
+  c.end('what the hell');
+}, 3000)
+
+
+
+```
+
+
+
+此场景下，客户端输出：
+
+```shell
+$ node tcp_cilent.js 
+finish 111
+finish 222
+end
+close
+```
+
+<br />
+
+服务端输出：
+
+```shell
+$ node tcp_server.js 
+listen on 9988  pid: 34930
+conneceted
+end
+  incoming _flush
+  incoming finish
+finish 111
+finish 222
+close
+```
+
+可以看到，两端的socket都正常关闭了。
+
+socket.pipe(income)实现上会为socket绑定data事件，把从socket读取的数据forward到income。
+
+对于socket来说，是有消费数据的，所以socket可以正常走完end、finish、close。
+
+
+
+那么，要如何理解income的finish呢？
+
+
+
+![socket_pipe](./images/socket_pipe.png)
+
+前面说过，对于socket，finish事件是在当前端发送FIN，且flush到底层fd后触发，表示不能往当前端写入任何数据，确切的说，是不能再写入数据到当前端的内部writable buffer，体现在代码上，就是`socket.write('xxx')`。触发finish的事件可以用这样的伪代码表示：
+
+```js
+socket.write('xxx') ---> socket.write(FIN) ---> flushTo(fd) ---> emit('finish')
+```
+
+
+
+对于income，没有底层fd，它的底层fd就是它自己，由socket转来的数据在代码上相当于`income.write('xxx')`，同样表示不能再往income里写数据。用伪代码表示：
+
+```js
+income.write('xxx') ---> income.write(FIN) ---> flushTo(income buffer) ---> emit('finish')
+```
+
+
+
+至于_flush方法在finish之前打印，是因为
+
+https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_transform_flush_callback
+
+> #### transform._flush(callback)[#](https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_transform_flush_callback)
+>
+> - `callback` [Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function) A callback function (optionally with an error argument and data) to be called when remaining data has been flushed.
+>
+> Custom [`Transform`](https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_class_stream_transform) implementations *may* implement the `transform._flush()` method. This will be called when there is no more written data to be consumed, but before the [`'end'`](https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_event_end) event is emitted signaling the end of the [`Readable`](https://nodejs.org/docs/latest-v10.x/api/stream.html#stream_class_stream_readable) stream.
+
+这是写入数据链会调用的最后一个方法，此时数据还没flush，必然会在finish事件之前。
+
+
+
+<br />
+
+如果想让income像socket一样，正常走完end、finish、close，那么同样的，需要消费完income的内部数据才会触发，方法也是跟前面的方法一样，绑定data事件、调用resume、多次调用read。
+
+```js
+const net = require('net');
+
+class Incoming extends require('stream').Transform {
+  _flush(callback) {
+    console.log('  incoming _flush')
+    this.push(null);
+    callback();
+  }
+
+  _transform(chunk, encoding, callback) {
+    callback(null, chunk);
+  }
+}
+const income = new Incoming();
+
+
+net.createServer(function(c) {
+  console.log('conneceted');
+
+  c.on('finish', function() {
+    console.log('finish 111');
+  })
+  
+  c.on('close', function() {
+    console.log('close');
+  })
+  
+  c.on('finish', function() {
+    console.log('finish 222');
+  })
+
+  c.on('end', function() {
+    console.log('end');
+  });
+
+  c.pipe(income);
+  income.on('end' ,function() {
+    console.log('  incoming end')
+  })
+  income.on('finish' ,function() {
+    console.log('  incoming finish')
+  })
+  income.on('close' ,function() {
+    console.log('  incoming close')
+  })
+
+  setTimeout(async () => {
+
+    // 方法1: 用flow mode
+    income.on('data', (chunk) => {
+      console.log(`income Received ${chunk.length} bytes of data. chunkStr:${chunk.toString()}`);
+    })
+    
+  	// 方法2: pause mode readable + read方法
+    income.on('readable', () => {
+      let chunk;
+      while (null !== (chunk = income.read())) {
+        console.log(`income Received ${chunk.length} bytes of data. chunkStr:${chunk.toString()}`);
+      }
+    });
+
+  	// 方法3: pause mode 直接read
+    for(let i = 0; i < 16;i++) {
+      const internelBuf = income.read(1);
+      console.log(`${i} income Received ${internelBuf ? internelBuf.length + ' bytes of data. chunkStr:' +  internelBuf.toString() : null }`);
+  
+      await new Promise((r,j) => {
+        setTimeout(() => {
+          r(true);
+        }, 2000)
+      })
+    }
+
+  	// 方法4: flow mode resume方法
+    income.resume();
+  }, 5000)
+
+
+}).listen(9988);
+
+console.log('listen on 9988', ' pid:', process.pid)
+```
+
+此时服务端就可以正常输出走完end、finish、close
+
+```shell
+$ node tcp_server.js 
+listen on 9988  pid: 35495
+conneceted
+end
+  incoming _flush
+  incoming finish
+finish 111
+finish 222
+close
+income Received 13 bytes of data. chunkStr:what the hell
+  incoming end
+  incoming close
+
+```
+
