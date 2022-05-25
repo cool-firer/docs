@@ -135,6 +135,86 @@ type Person struct {
 
 
 
+#### 再举个例子
+
+当前目录结构
+
+```shell
+demon@demondeMacBook-Pro grpc $ tree
+.
+├── go.mod
+└── pb
+    └── hello.proto
+```
+
+
+
+hello.proto内容：
+
+```protobuf
+syntax = "proto3"; // 版本声明，使用Protocol Buffers v3版本
+
+option go_package = "./pb";  // 指定go package名称；xx根据需要替换
+
+package pb; // 包名
+
+
+// 定义一个打招呼服务
+service Greeter {
+    // SayHello 方法
+    rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// 包含人名的一个请求消息
+message HelloRequest {
+    string name = 1;
+}
+
+// 包含问候语的响应消息
+message HelloReply {
+    string message = 1;
+}
+
+```
+
+go_package必须要包含.或者/字符。
+
+
+
+go.mod名称与文件名可以不一样，go.mod内容：
+
+```go
+module grpctest
+
+go 1.15
+
+```
+
+
+
+跑编译
+
+```shell
+demon@demondeMacBook-Pro grpc $ protoc -I=. --go_out=. ./pb/hello.proto
+```
+
+
+
+生成pb.go文件
+
+```shell
+demon@demondeMacBook-Pro grpc $ tree
+.
+├── go.mod
+└── pb
+    ├── hello.pb.go
+    └── hello.proto
+```
+
+且生成的hello.pb.go的package是pb
+
+
+
 #### package和option go_package
 
 .proto文件里 option go_package学名叫Go import path，与 package没有啥联系, package只用于名空间。
