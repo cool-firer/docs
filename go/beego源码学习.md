@@ -140,7 +140,7 @@ func init() {
 
 [一张图说明](https://beego.vip/docs/quickstart/router.md)
 
-
+![init_order](./images/init_order.png)
 
 
 
