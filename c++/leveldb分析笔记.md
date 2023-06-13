@@ -131,6 +131,22 @@ int LockOrUnlock(int fd, bool lock) {
 }
 ```
 
+锁定fd的部分，https://www.cnblogs.com/kex1n/p/13055518.html
+
+
+
+# ::access
+
+https://www.jianshu.com/p/d7c190abde82
+
+F_OK: 文件是否存在
+
+```c++
+bool FileExists(const std::string& filename) override {
+  return ::access(filename.c_str(), F_OK) == 0;
+}
+```
+
 
 
 # std::string
@@ -145,7 +161,162 @@ size(): 返回字节长度。
 
 push_back(): 往后追加一个字符, 且增加长度。
 
-append(): 追加一个字符串
+append(): 追加一个字符串。
+
+remove_prefix()
+
+
+
+
+
+# std::va_list
+
+```c++
+#include <cstdarg>
+
+void Log(Logger* info_log, const char* format, ...) {
+
+  if (info_log != nullptr) {
+    // 定义了一个指针 ap, 用于指示可选的参数.
+    std::va_list ap;
+    
+    // 固定格式, ap 指向函数参数列表中的第一个可选参数，argN 是位于第一个可选参数之前的固定参数
+    va_start(ap, format);
+    info_log->Logv(format, ap);
+    
+    // 清空参数列表, 并置参数指针 ap 无效
+    va_end(ap);
+  }
+  
+}
+```
+
+
+
+
+
+
+
+
+
+# O_CLOEXEC
+
+  int fd = ::open(filename.c_str(), O_RDWR | O_CREAT | O_CLOEXEC, 0644);
+
+fork出的子进程，保留父进程的fd，但一旦子进程执行了exec，就自动关闭继承来的fd。
+
+
+
+# manifest文件格式
+
+![manifest](./leveldb_pic/manifest.png)
+
+
+
+# db/log_writer.cc # Writer的写入流程
+
+```c++
+class Writer {
+  WritableFile* dest_;
+  int block_offset_;  // 当前块的偏移
+  uint32_t type_crc_[kMaxRecordType + 1]; // kMaxRecordType: 4
+  
+  Status AddRecord(const Slice& slice); // 调用此方法写入数据
+};
+
+// block大小: 32KB
+static const int kBlockSize = 32768;
+  
+// Header is checksum (4 bytes), length (2 bytes), type (1 byte).
+// 单次写入数据的头部长度 4字节crc + 2字节长度 + 1字节类型
+static const int kHeaderSize = 4 + 2 + 1;
+```
+
+Writer抽象出了block的概念，但并不拥有一个实际的block，一个block最大是32KB。
+
+实例化一个新的Writer，调用AddRecord写入数据，梳理下写入流程：
+
+1. 写入10KB，此时offset右移;
+
+   ![writer_01](./leveldb_pic/writer_01.png)
+
+2. 写入R + x，最后剩下5个字节 < Header；
+
+   ![writer_02](./leveldb_pic/writer_02.png)
+
+3. 再写入10KB，此时offset到末尾不足一个Header的长度，用0x00来填充，另起一个Block。
+
+   ![writer_03](./leveldb_pic/writer_03.png)
+
+
+
+
+
+# 看level如何读文件
+
+有如下文件：testdb/CURRENT，内容是:
+
+```c++
+MANIFEST-000002
+
+```
+
+
+
+调用代码读:
+
+```c++
+std::string current;
+Status s = ReadFileToString(env_, "testdb/CURRENT", &current);
+...
+
+  
+Status ReadFileToString(Env* env, const std::string& fname, std::string* data) {
+  data->clear();
+  SequentialFile* file;
+  
+  // 打开文件, 保存fd到file对象
+  env->NewSequentialFile(fname, &file);
+  
+  static const int kBufferSize = 8192;
+  char* space = new char[kBufferSize];
+  while (true) {
+    Slice fragment;
+    s = file->Read(kBufferSize, &fragment, space);
+    if (!s.ok()) {
+      break;
+    }
+    data->append(fragment.data(), fragment.size());
+    if (fragment.empty()) {
+      break;
+    }
+  }
+  ...
+}
+
+```
+
+
+
+其中NewSequentialFile()里今file指向的实际对象是PosixSequentialFile: 
+
+```c++
+class PosixSequentialFile final : public SequentialFile {
+  int fd_; // 指向打开的文件
+  std::string filename_; // 文件名
+  
+  Read(size_t n, Slice* result, char* scratch);
+  Skip(uint64_t n);
+};
+```
+
+
+
+所以过程简单，就是读文件内容到一块内存，一直读到空为止。
+
+
+
+
 
 
 

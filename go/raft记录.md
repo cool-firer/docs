@@ -720,7 +720,7 @@ func (r *Raft) electSelf() <-chan *voteResult {
 
 
 
-再看收到其他节点的投票结果如何处理
+再看收到其他节点的投票结果如何处理：
 
 ```go
 // raft@v1.1.2/raft.go
@@ -1006,9 +1006,27 @@ func (r *Raft) requestVote(rpc RPC, req *RequestVoteRequest) {
 
 
 
+# 从数据一致性看日志复制
 
+小例子收到写入数据请求时的处理：
 
+```go
+// raft-demo/main.go
 
+func (h HttpServer) Set(w http.ResponseWriter, r *http.Request) {
+
+	data := "set" + "," + key + "," + value
+	future := h.ctx.Apply([]byte(data), 5 * time.Second)
+	if err := future.Error(); err != nil {
+		fmt.Fprintf(w, "error:" + err.Error())
+		return
+	}
+	fmt.Fprintf(w, "ok")
+	return
+}
+```
+
+调用的是
 
 
 
@@ -1218,6 +1236,25 @@ rf, err := raft.NewRaft(config, fsm, logStore, stableStore, snapshots, transport
 		
 		routinesGroup sync.WaitGroup,
 		
+		// 成为Leader时
+		leaderState: {
+			commitCh: make(chan struct{}, 1)
+			commitment: &commitment{
+					commitCh: commitCh,
+					matchIndexes: { serverID => int },
+					commitIndex:  0,
+					startIndex:   r.getLastIndex()+1,
+			},
+			inflight: list.New(),
+			
+			replState: make(map[ServerID]*followerReplication): {
+				"2" => {},
+				"3" => {},
+			},
+			
+			notify : make(map[*verifyFuture]struct{})
+			tepDown : make(chan struct{}, 1)
+		}
 		
 	}
 */
@@ -1249,6 +1286,20 @@ github.com/hashicorp/raft-boltdb
 os.Getpagesize() int 操作系统内存页大小 单位byte
 
 
+
+
+
+寻找一种易于理解的共识算法
+
+(扩展版本)
+
+Diego Ongaro 和 John Ousterhout 
+
+斯坦福大学
+
+
+
+概要
 
 
 

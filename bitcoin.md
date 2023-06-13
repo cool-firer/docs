@@ -22,7 +22,7 @@ https://github.com/bitcoin/bitcoin/blob/0.19/doc/build-osx.md
 
 启动不维护区块
 
-./src/bitcoind -maxconnections=0 
+./src/bitcoind -maxconnections=0  -datadir=/Users/luke/Desktop/work/bitcoin/data
 
 
 
@@ -36,3 +36,19 @@ https://github.com/chaors/Bitcoin_read/blob/master/Docs/0x00bitcoin%E6%9C%AC%E5%
 
 入口文件：bitcoin/src/bitcoind.cpp
 
+
+
+
+
+vscode调试
+
+ cd bitcoin/
+  ./autogen.sh
+  ./configure --disable-wallet --without-gui --without-miniupnpc --enable-debug
+  make check
+
+
+
+
+
+默认DataDir: "/Library/Application Support/Bitcoin"
