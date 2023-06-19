@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 ## async/await
 
 async返回一个promise。
@@ -106,3 +98,33 @@ for (let i = 0; i < arr.length; i++) {
 
 
 
+## void 0
+
+this.value = void 0;
+
+void后接任何表达式都返回undef，因为在一些低版本浏览器或者局部环境内，undef值可以被改写，不是一个只读的全局关键字，所以就可能使得 a === undef 判断变量是否是undef失效，用void就可以避免这样的问题。
+
+
+
+## Promise报错没有catch的情况
+
+```js
+'use strict';
+
+setInterval(() => {
+  console.log(Date.now());
+}, 1000);
+
+const promise = new Promise((resolve, reject) => {
+  console.log(aaa);
+});
+```
+
+控制台抛出这样的错误，但程序还在运行。
+
+```shell
+(node:40906) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). (rejection id: 1)
+(node:40906) [DEP0018] DeprecationWarning: Unhandled promise rejections are deprecated. In the future, promise rejections that are not handled will terminate the Node.js process with a non-zero exit code.
+```
+
+暂时来看，Promise未处理错误不会有事，但最好不要这样。
