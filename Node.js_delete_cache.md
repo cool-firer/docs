@@ -130,7 +130,7 @@ Type ".help" for more information.
 
 此时的依赖关系如图：
 
-![nodejs_cache1.png](E:\chat\docs\images\nodejs_cache1.png)
+![nodejs_cache1.png](./images/nodejs_cache1.png)
 
 此时我要热更C, 如果只delete C：
 
@@ -155,7 +155,5 @@ delete require.cache[require.resolve('./child.js')]
 ```
 
 如果需要热更，需要清楚的知道每个module的依赖关系，才能确保不出现内存泄露。
-
-
 
 参考资料： https://zhuanlan.zhihu.com/p/34702356
