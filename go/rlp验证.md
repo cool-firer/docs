@@ -66,3 +66,51 @@ func TestEncodeBigInt(t *testing.T) {
 }
 ```
 
+
+
+
+
+# [RLP List](#List)
+
+
+
+```go
+package rlp_test
+
+import (
+	"bytes"
+	"fmt"
+
+	"github.com/ethereum/go-ethereum/rlp"
+)
+
+func ExampleEncoderBuffer() {
+	var w bytes.Buffer
+
+	// Encode [1, 2, 3, [4, 5, 6, 7, 8, 9]]
+	buf := rlp.NewEncoderBuffer(&w)
+	l1 := buf.List()
+	buf.WriteUint64(1)
+	buf.WriteUint64(2)
+	buf.WriteUint64(3)
+	l2 := buf.List()
+	buf.WriteUint64(4)
+	buf.WriteUint64(5)
+	buf.WriteUint64(6)
+	buf.WriteUint64(7)
+	buf.WriteUint64(8)
+	buf.WriteUint64(9)
+	buf.ListEnd(l2)
+	buf.ListEnd(l1)
+
+	if err := buf.Flush(); err != nil {
+		panic(err)
+	}
+	fmt.Printf("%X\n", w.Bytes())
+	// Output:
+	// C404C20506
+}
+
+
+```
+
