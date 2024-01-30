@@ -63,7 +63,7 @@ promise.then(() => {
 
 ### promise代码例子
 
-一、输出 1 2 3 4 
+一、输出 1 2 4 3 
 
 Promise的构造函数是同步执行的，then中的函数是异步。
 
