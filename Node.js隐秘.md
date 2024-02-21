@@ -128,3 +128,49 @@ const promise = new Promise((resolve, reject) => {
 ```
 
 暂时来看，Promise未处理错误不会有事，但最好不要这样。
+
+
+
+## package.json版本规则
+
+major主.minor次.patch
+
+**~规则：**
+
+* minor指定了，则minor不变，patch任意。
+* 只指定了major，minor、patch任意。
+
+可以简单归结为：锁定主、次版本。
+
+```javascript
+// patch任意
+~1.1.2：>=1.1.2 < 1.2.0
+~1.1：>=1.1.0 < 1.2.0
+
+// minor、patch任意
+~1：>=1.0.0 < 2.0.0
+
+"dependencies": {
+    "accepts": "~1.3.7"
+}
+```
+
+**^规则：**
+
+* 锁定从左到右第一个非0的版本
+
+```javascript
+^1.2.3：>=1.2.3 < 2.0.0 // 从左到右, 第一个非0是1, 锁定1
+^0.2.3：>=0.2.3 < 0.3.0 // 第一个非0是2
+^0.0.3：>=0.0.3 < 0.0.4 // 第一个非0是3
+
+"dependencies": {
+    "accepts": "^1.3.7"
+}
+```
+
+
+
+## package-lock.json作用
+
+用来锁定版本号。

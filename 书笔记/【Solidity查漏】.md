@@ -222,3 +222,25 @@ function kk() pure {
 }
 ```
 
+
+
+# Events事件
+
+```c#
+event Transfer(address indexed from, address indexed to, uint256 value);
+```
+
+indexed与非indexed的区别？
+
+首先事件是用日志Log来存储，每一条日志都包含两个部分：Topics和Data。
+
+主题Topics长度最多为4，第一个是事件选择器、后面三个是indexed参数值。
+
+剩余的非indexed参数存在Data中。
+
+所以第一点不同就是，个数不一样，最多只能有三个indexed类型参数，非indexed个数不限。
+
+第二点是，indexed参数可以被索引，客户端过滤。非indexed不行。
+
+
+
