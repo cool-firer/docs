@@ -280,7 +280,7 @@ M必须跟P绑定，才能运行G。
 
 四级管理。
 
-首先是span。Go有67级span，各个级别的span大小不同，比如说一级span的容量是一个page，8KB，元素大小8个字节。然后各级span都有前后指针连接起来。相当于有67条链。
+首先是span。Go有67级span，各个级别的span大小不同，比如说第一级span的容量是一个page，8KB，元素大小8个字节。然后各级span都有前后指针连接起来。相当于有67条链。
 
 有了这67条链，还需要个容器来管理它们，那就是cache。
 
@@ -331,13 +331,13 @@ heap是最高级别的抽象，管理着全部的内存。
 
 Go用的标记清除算法，三色标记法。
 
-白色：还在等待标记的对象；
+白色：在等待标记的对象；
 
 灰色：正在标记中的对象；
 
 黑色：已经标记完的对象；
 
-首先从根对象出发，引用到的对象置灰，再依次从灰对象出发，将灰对象引用的对象置灰的时候，将本对象置黑。
+首先从根对象出发，引用到的对象置灰，再依次从灰对象出发，将灰对象引用的对象置灰的同时，将本对象置黑。
 
 剩余的白色对象，就是可以被清除的对象。
 
@@ -699,4 +699,213 @@ func WrongTicker() {
 
 
 # 第10章 语法糖
+
+**简短变量声明**
+
+```go
+i := 0
+j, k := 1, 2
+
+// 声明f1, offset
+f1, offset := nextFiled(str, 0);
+
+// 存在新变量一起声明时, 可以重新声明已声明的变量. 是同一个offset, 只是值变了。
+f2, offset := nextFiled(str, 1);
+
+// offset := 3 这个就不行, 因为没有新变量一起声明
+```
+
+
+
+# 第11章 泛型
+
+**声明泛型函数**
+
+```go
+func SumIntsOrFloats[K comparable, V int64 | float64] (m map[K]V) V {
+  var s V
+  for _, v := range m {
+    s += V
+  }
+  return s
+}
+```
+
+* 通过[K comparable, V int64 | float64] 声明两个类型参数K, V。
+* K类型必须是comparable类型，V可以是int64或float64。
+* 参数m表示一个泛化的map。
+
+调用泛型函数：
+
+* 显示调用：
+
+  ```go
+  SumIntsOrFloats[string, int64)(ints)
+  SumIntsOrFloats[string, float64)(floats)
+  ```
+
+* 隐式调用：
+
+  ```go
+  SumIntsOrFloats(ints)
+  ```
+
+  
+
+# 第12章 依赖管理
+
+三个阶段：
+
+* GOPATH
+* Vendor（Go 1.6起）
+* Go Module（Go1.11起）
+
+
+
+GOROOT：go的安装目录，包括标准库、二进制。
+
+GOPATH：工作空间目录。
+
+某个package引用包时，依次从GOROOT/src/和GOPATH/src/中查找。
+
+
+
+Vendor搜索路径：
+
+从当前文件目录下找vendor目录，没有则找上层目录的vendor目录，再往一层层往上。
+
+如果还是没有，则退到GOPATH方式。
+
+
+
+Go Module
+
+```go
+> go mod init github.com/xxx/gomodules
+
+生成的go.mod内容:
+module github.com/xxx/gomodules
+
+go 1.13
+
+require github.com/google/uuid v1.1.1
+```
+
+
+
+go.mod文件的指令
+
+* module：声明module的名称，import时用的。
+* require：声明依赖及版本号。
+* replace：替换require中声明的依赖，使用另外的依赖及其版本号。
+* exclude：排除某个版本，不使用。
+* indirect：表示这个包没有被直接依赖，可能是间接依赖。
+
+
+
+replace：
+
+替换require中出现过的包，用v1.1.0：
+
+```go
+module github.com/xxx/gomodules
+go 1.13
+
+require github.com/google/uuid v1.1.1
+replace github.com/google/uuid v1.1.1 => github.com/google/uuid v1.1.0
+```
+
+替换无法下载的包：
+
+```go
+module github.com/xxx/gomodules
+go 1.13
+
+require (
+  github.com/google/uuid v1.1.1
+  golang.org/x/text v0.3.2
+)
+
+replace (
+  github.com/google/uuid v1.1.1 => github.com/google/uuid v1.1.0
+  golang.org/x/text v0.3.2 => github.com/golang/text v0.3.2
+)
+```
+
+调试依赖包：
+
+```go
+replace (
+  github.com/google/uuid v1.1.1 => ../uuid
+)
+```
+
+
+
+indirect：
+
+直接依赖的module没有启用go.mod，此时会在当前module下记录indirect。
+
+```go
+          ---> B1
+A --->  B |(B没有go.mod)
+          ---> B2
+
+// 执行go mod tidy会在A的go.mod下记录
+require (
+  B vx.x.x
+  B1 vx.x.x // indirect
+  B2 vx.x.x // indirect
+)
+```
+
+直接依赖的module启用了go.mod，但记录缺失。也会在当前module下记录indirect。
+
+
+
+go mod why -m github.com/retry：查看依赖链。
+
+
+
+**incompatible：**
+
+Go Module规定，如果major版本号>1，则module名字应该变为：
+
+github.com/RainbowMango/m/v2。
+
+如果某个module没有遵循这个规定，那会有incompatible标志：
+
+```go
+require (
+  // 这个modul没有遵循命名规定, 所有会有incompatible
+  github.com/RainbowMango/m V3.6.0+incompatible
+)
+```
+
+
+
+**伪版本：**
+
+v1.2.3这样的语义化版本，实际是某个commit ID。
+
+如果不使用语义化版本，直接用commit ID的话，就是伪版本。
+
+```go
+require (
+  go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738
+)
+```
+
+
+
+**go.sum**
+
+记录每个依赖包的Hash值。用来校验包的正确性。由Module名、版本、hash值组成。
+
+一个module由两条组成：
+
+```go
+github.com/google/uuid v1.1.1 h1:GkXwew320dfwea= // 所有文件的hash值
+github.com/google/uuid v1.1.1/go.mod h1:TIyPZE4Mwe+hk= // go.mod文件的hash值
+```
 
