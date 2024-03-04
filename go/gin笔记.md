@@ -136,7 +136,7 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
 一、没有通配符:和*
 
-![n1](/Users/demon/Desktop/own/gitdocs/go/images/n1.png)
+![n1](images/n1.png)
 
 <br />
 
@@ -152,13 +152,13 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
   1. A = $\emptyset$，B  = $\emptyset$   此时生成的路由树如下，W表示wildcard，虚线表示不挂载handlers。
 
-     ![n2](./images/n2.png)
+     ![n2](images/n2.png)
 
   
 
   2. A = $\emptyset$，B $\neq $ $\emptyset$  取 k = Min(B) 此时生成的路由树如下
 
-     ![n3](./images/n3.png)
+     ![n3](images/n3.png)
 
      
 
@@ -170,11 +170,11 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
      - j > k 以k的分界线，先生成k之前的部分，之后再以k为起点，递归的从1开始生成子结点
 
-       ![n4](./images/n4.png)
+       ![n4](images/n4.png)
 
        以/user:name/uid:uid为例，生成的路由树如下：
 
-       ![n5](./images/n5.png)
+       ![n5](images/n5.png)
 
 <br />
 
@@ -188,7 +188,7 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
 形成的路由树以及一个例子/user/name/*name，其中左边绿色小方框的是fullPath，右边橙色的是indices 
 
-![n6](./images/n6.png)
+![n6](images/n6.png)
 
 四、有:号，且有*号，根据三的结论，\*号只能有一个，且\*号只能在路径最后面，此时可以这样处理
 
@@ -204,7 +204,7 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
   下图为例子 /user/name/:name/id/:id/sex/*sex
 
-  ![n7](./images/n7.png)
+  ![n7](images/n7.png)
 
   
 
@@ -216,11 +216,11 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
   设已有的路由树如下
 
-  ![n8](./images/n8.png)
+  ![n8](images/n8.png)
 
   要添加的路径为 S = S~1~S~2~S~3~...S~m~，R与S的最长公共子串为C = C~1~C~2~C~3~...C~i~，i$\in$\[1, Min(n, m)\]，i、m、n三者关系讨论：
 
-  ![n9](./images/n9.png)
+  ![n9](images/n9.png)
 
   只有 ① ② ③ ④ 有效，其他都是无效的组合。
 
@@ -228,7 +228,7 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
   - 对于①，此时需要将R分裂，C（即 R~1~R~2~R~3~...R~i~）作为父结点，R~i+1~...R~n~子结点
 
-  ![n10](./images/n10.png)
+  ![n10](images/n10.png)
 
   - 对于 ③，相当于无效路由；
 
@@ -236,7 +236,7 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
     1. 截取 P = S~i+1~...S~m~；
 
-       ![n11](./images/n11.png)
+       ![n11](images/n11.png)
 
     2. 如果当前结点R是个param结点，S~i+1~ = /，且 R有子结点（有的话只会有一个子结点）：
 
@@ -244,7 +244,7 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
        回到起点；
 
-       ![n12](./images/n12.png)
+       ![n12](images/n12.png)
 
     3. 如果在当前结点R的indices（param结点不会有indices）中能找到相同的S~i+1~值，说明在R的子结点中，有相同的前缀：
 
@@ -256,7 +256,7 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
        回到起点；
 
-       ![n13](./images/n13.png)
+       ![n13](images/n13.png)
 
     4. 如果S~i+1~ != :，且S~i+1~ != *：
 
@@ -266,7 +266,7 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
        最后返回；
 
-       ![n14](./images/n14.png)
+       ![n14](images/n14.png)
 
        
 
@@ -274,7 +274,7 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
        W值为true，只能是param和catchAll两种情况，且两种情况的模式是这样：
 
-       ![n15](./images/n15.png)
+       ![n15](images/n15.png)
 
        对于catchAll模式，直接panic退出。因为catchAll是通配后缀所有的字符串，gin规定不能在其后面添加路径；
 
@@ -288,7 +288,7 @@ n.children = append(n.children[:len(n.children)-1], child, wildcardChild)
 
        回到起点；
 
-       ![n16](./images/n16.png)
+       ![n16](images/n16.png)
 
 
 
