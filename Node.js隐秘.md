@@ -174,3 +174,49 @@ major主.minor次.patch
 ## package-lock.json作用
 
 用来锁定版本号。
+
+
+
+## 箭头函数
+
+箭头函数内部与其外部的this是保持一致的。
+
+```javascript
+var obj = {
+  birth: 10,
+  getAge: function () {
+    var b = this.birth; // 10
+    var fn = function () {
+      return 100 - this.birth; // this指向window或undefined
+    };
+    return fn();
+  }
+};
+obj.getAge(); // 返回NaN
+
+
+var obj = {
+  birth: 10,
+  getAge: function () {
+    var b = this.birth; // 10
+    var fn = () => 30 - this.birth; // this指向obj对象
+    return fn();
+  }
+};
+obj.getAge(); // 20
+```
+
+因为箭头函数在定义的时候已经绑定了this，因此call、apply方法会失效：
+
+```javascript
+var obj = {
+  birth: 10,
+  getAge: function (year) {
+    var b = this.birth; // 10
+    var fn = (y) => y - this.birth; // this.birth仍是10
+    return fn.call({birth:2000}, year);
+  }
+};
+obj.getAge(30); // 20
+```
+
