@@ -209,3 +209,28 @@ ReadView取数据规则：
 
 
 
+# B+树
+
+查看页大小
+
+```mysql
+show global status like 'Innodb_page_size';
+
+Variable_name			Value
+Innodb_page_size	16384   (16KB)
+```
+
+一页大小是16KB，也就是说一个B+树结点，一次分配是16KB，一页。这样可以算出，只用一页的情况下，高度为3的B+树，能存多少数据。
+
+![b+tree_01](img/b+tree_01.png)
+
+
+
+# 索引名词
+
+聚集索引：像B+树主键索引那样，叶子结点即放索引，又放整行数据。
+
+非聚集索引：索引跟数据分开放，像MyIsam的B+树主键索引。
+
+联合索引：
+
