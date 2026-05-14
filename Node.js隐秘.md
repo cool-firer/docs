@@ -19,7 +19,6 @@ async function func() {
 
 console.log(func());
 console.log('ww');
-
 ```
 
 输出：
@@ -45,8 +44,6 @@ ww
 取余：-7 mod 4 = -1 ...... -3 (node用的取余)
 
 取模：-7 mod 4 = -2 ...... 1
-
-
 
 再如：7 mod -4
 
@@ -96,15 +93,11 @@ for (let i = 0; i < arr.length; i++) {
 }
 ```
 
-
-
 ## void 0
 
 this.value = void 0;
 
 void后接任何表达式都返回undef，因为在一些低版本浏览器或者局部环境内，undef值可以被改写，不是一个只读的全局关键字，所以就可能使得 a === undef 判断变量是否是undef失效，用void就可以避免这样的问题。
-
-
 
 ## Promise报错没有catch的情况
 
@@ -128,8 +121,6 @@ const promise = new Promise((resolve, reject) => {
 ```
 
 暂时来看，Promise未处理错误不会有事，但最好不要这样。
-
-
 
 ## package.json版本规则
 
@@ -169,13 +160,9 @@ major主.minor次.patch
 }
 ```
 
-
-
 ## package-lock.json作用
 
 用来锁定版本号。
-
-
 
 ## 箭头函数
 
@@ -219,4 +206,34 @@ var obj = {
 };
 obj.getAge(30); // 20
 ```
+
+
+
+## 移位操作
+
+JavaScript 的硬规则：所有位运算操作数都会先被强制转换为 `int32`（有符号 32 位整数）。
+
+```javascript
+1 << 31
+
+等价于：
+(int32(1)) << 31
+
+
+1           = 00000000 00000000 00000000 00000001
+1 << 31     = 10000000 00000000 00000000 00000000
+
+
+JS 把它解释为 int32 补码：
+1000...000 = -2^31 = -2147483648
+```
+
+这里跟Go不一样。
+
+Go的字面量位移是按照纯数学意义上的：
+
+```go
+2³¹ = 2147483648
+```
+
 
