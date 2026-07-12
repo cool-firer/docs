@@ -21,11 +21,7 @@
 - [合约升级的一点疑问](#合约升级的一点疑问)
   - [1. 代理合约 A 到底长什么样？](#1-代理合约-a-到底长什么样)
   - [2. 为什么只在 B 里加变量？](#2-为什么只在-b-里加变量)
-      - [**发生了什么？**](#发生了什么)
-
-
-
-
+    - [**发生了什么？**](#发生了什么)
 
 # Fixed Point number
 
@@ -134,14 +130,15 @@
   // 现代标准写法：
   (bool success, ) = x.call{value: 10}(""); 
   require(success, "Transfer failed.");
+  
+  
+  address(nameReg).call{gas: 1000000, value: 1 ether}(
+   abi.encodeWithSignature("register(string)", "MyName")
+  );
   ```
 
-  address(nameReg).call{gas: 1000000, value: 1 ether}(
-    abi.encodeWithSignature("register(string)", "MyName")
-  );
+ **`call` 和 `transfer` 的核心区别：**
 
-```
-#### **`call` 和 `transfer` 的核心区别：**
 
 | **特性**     | **x.transfer(amount)** | **x.call{value: amount}("")** |
 | ---------- | ---------------------- | ----------------------------- |
@@ -238,7 +235,6 @@
 
 ```solidity
 x.call{value: 10}("")
-```
 
 1. `msg.data` 为空时 (纯转账)
 - **情况 1：有 `receive() payable`**
@@ -763,7 +759,7 @@ function (string memory) external ptr;
 contract Target {
     // 实现 A: 使用 memory 接收
     function f(string memory _s) external pure {}
-    
+
     // 实现 B: 使用 calldata 接收（更省 Gas）
     function g(string calldata _s) external pure {}
 }
@@ -787,8 +783,6 @@ contract Caller {
     }
 }
 ```
-
-
 
 ## **Solidity 外部函数变量在 ABI 编码（ABI Encoding）时的底层表现**。
 
@@ -913,8 +907,6 @@ t.test(100); // 正常调用
 - **优点**：`Decoder` 拥有这个新 Target 的“绝对控制权”（它是创建者）。
 
 - **缺点**：非常费 Gas，因为你在交易过程中执行了“部署”这个重体力劳动。
-
-
 
 ## 合约更新时的稳定性
 
@@ -1051,5 +1043,3 @@ contract Proxy {
 **结论：** 代理合约 A 就像是一个**通用的储物柜**，它不需要知道里面装的是金条还是银条。只要逻辑合约 B 知道哪层抽屉（Slot）放的是什么，A 就能配合。
 
 <br />
-
-
