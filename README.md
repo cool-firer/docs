@@ -10,4 +10,5 @@
 8. [Node.js热更问题](https://github.com/cool-firer/docs/blob/main/Node.js_delete_cache.md)
 9. [Mysql隔离](./mysql/isolation.md)
 10. [Mysql索引](./mysql/index.md)
-11. [nestjs简记](./nestjs简记.md)
+11. [Mysql对比PG](./mysql/pg.md)
+12. [nestjs简记](./nestjs简记.md)
