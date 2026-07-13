@@ -12,3 +12,5 @@
 10. [Mysql索引](./mysql/index.md)
 11. [Mysql对比PG](./mysql/pg.md)
 12. [nestjs简记](./nestjs简记.md)
+13. [多进程端口](./za/port.md)
+14. [一致性哈希](./za/consistent_hash.md)
